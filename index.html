@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Masters — BI Unclosed Estimates Report</title>
+  <style>
+    :root {
+      --blue:#1a56db; --blue-light:#e8f0fe;
+      --green:#0e9f6e; --green-light:#def7ec;
+      --orange:#ff5a1f; --orange-light:#fde8d8;
+      --purple:#7c3aed; --purple-light:#ede9fe;
+      --red:#dc2626; --red-light:#fee2e2;
+      --yellow:#d97706; --yellow-light:#fef3c7;
+      --navy:#1E2A5E; --bg:#f3f4f6; --card:#fff;
+      --border:#e5e7eb; --text:#111827; --muted:#6b7280;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text)}
+    .header{background:linear-gradient(135deg,#1E2A5E 0%,#2a3a7a 100%);color:white;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .header-left{display:flex;align-items:center;gap:14px}
+    .header-badge{background:rgba(255,255,255,0.15);border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+    .header-title{font-size:20px;font-weight:800;letter-spacing:-.4px}
+    .header-sub{font-size:12px;opacity:.7;margin-top:3px}
+    .live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.2);border:1px solid rgba(52,211,153,.4);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:#34d399;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .container{max-width:1080px;margin:0 auto;padding:24px 16px}
+    .section-heading{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:24px 0 10px}
+    .alert-bar{display:flex;align-items:flex-start;gap:12px;background:var(--red-light);border:1px solid #fca5a5;border-radius:10px;padding:14px 16px;margin-bottom:20px}
+    .period-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+    .period-tab{padding:7px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--border);background:white;color:var(--muted);transition:all .15s;user-select:none}
+    .period-tab:hover{border-color:var(--blue);color:var(--blue)}
+    .period-tab.active{background:var(--blue);border-color:var(--blue);color:white}
+    .period-panel{display:none}.period-panel.active{display:block}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+    .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+    .kpi-card.blue::before{background:var(--blue)}.kpi-card.green::before{background:var(--green)}
+    .kpi-card.red::before{background:var(--red)}.kpi-card.orange::before{background:var(--orange)}
+    .kpi-card.yellow::before{background:var(--yellow)}.kpi-card.purple::before{background:var(--purple)}
+    .kpi-icon{font-size:22px;margin-bottom:8px}
+    .kpi-value{font-size:26px;font-weight:800;line-height:1.1}
+    .kpi-label{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .kpi-note{font-size:10px;color:var(--muted);margin-top:4px}
+    .accordion-grid{display:flex;flex-direction:column;gap:10px}
+    .acc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .acc-header{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none;transition:background .15s;flex-wrap:wrap}
+    .acc-header:hover{background:#f9fafb}
+    .acc-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .acc-icon.blue{background:var(--blue-light)}.acc-icon.green{background:var(--green-light)}
+    .acc-icon.orange{background:var(--orange-light)}.acc-icon.red{background:var(--red-light)}
+    .acc-icon.yellow{background:var(--yellow-light)}.acc-icon.purple{background:var(--purple-light)}
+    .acc-meta{flex:1;min-width:150px}
+    .acc-title{font-size:15px;font-weight:700}
+    .acc-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .acc-pill{font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+    .acc-pill.blue{background:var(--blue-light);color:var(--blue)}
+    .acc-pill.green{background:var(--green-light);color:var(--green)}
+    .acc-pill.red{background:var(--red-light);color:var(--red)}
+    .acc-pill.yellow{background:var(--yellow-light);color:var(--yellow)}
+    .acc-chevron{font-size:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+    .acc-card.open .acc-chevron{transform:rotate(180deg)}
+    .acc-body{display:none;padding:0 20px 18px;border-top:1px solid var(--border)}
+    .acc-card.open .acc-body{display:block}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+    .badge-red{background:var(--red-light);color:var(--red)}
+    .badge-green{background:var(--green-light);color:var(--green)}
+    .badge-yellow{background:var(--yellow-light);color:var(--yellow)}
+    .badge-gray{background:#f3f4f6;color:#6b7280}
+    .job-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+    .job-stat{flex:1;min-width:80px;background:var(--bg);border-radius:8px;padding:12px 14px;text-align:center}
+    .job-stat-val{font-size:20px;font-weight:800}
+    .job-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+    .legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:white;border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:16px}
+    .footer{background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:14px;font-size:11px;margin-top:32px}
+    .footer strong{color:rgba(255,255,255,.9)}
+    @media(max-width:600px){
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}
+      .header-title{font-size:16px}
+      .kpi-value{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-badge">⚡ BI Enhanced</div>
+    <div>
+      <div class="header-title">Weather Masters of Georgia — BI Unclosed Estimates Report</div>
+      <div class="header-sub">Business Intelligence (BI) Report &nbsp;·&nbsp; Data through June 15, 2026 &nbsp;·&nbsp; Powered by Wright AI Labs</div>
+    </div>
+  </div>
+  <div>
+    <div class="live-badge"><span class="live-dot"></span> Live Data</div>
+    <div style="font-size:11px;opacity:.55;text-align:right;margin-top:4px;">Updated 6/15/2026</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="alert-bar" style="margin-top:4px;">
+    <div style="font-size:22px;flex-shrink:0">🚨</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--red)">$596,745 in Unclosed Estimates — 72 Jobs Waiting to Be Signed</div>
+      <div style="font-size:12px;color:#7f1d1d;margin-top:2px">65 estimates are 7+ days old. Every day without follow-up is revenue at risk. Click any estimate below to expand details.</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span>🔴 <strong>High Priority</strong> — 7+ days old &amp; $5K+</span>
+    <span>🟡 <strong>Follow-Up Needed</strong> — 7+ days old</span>
+    <span>🟢 <strong>High Value</strong> — $5K+ (recent)</span>
+    <span>⚪ <strong>Monitor</strong> — Under 7 days / under $5K</span>
+  </div>
+
+  <div class="section-heading">📊 Pipeline Summary — Select Lookback Period</div>
+  <div class="period-tabs">
+    <div class="period-tab" onclick="switchPeriod('7d',this)">Last 7 Days</div>
+    <div class="period-tab" onclick="switchPeriod('30d',this)">Last 30 Days</div>
+    <div class="period-tab" onclick="switchPeriod('60d',this)">Last 60 Days</div>
+    <div class="period-tab active" onclick="switchPeriod('90d',this)">Last 90 Days</div>
+  </div>
+
+  <div class="period-panel" id="panel-7d">
+    <div class="kpi-grid">
+      <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">7</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Appt within last 7 days</div></div>
+      <div class="kpi-card green"><div class="kpi-icon">💰</div><div class="kpi-value" style="color:var(--green)">$31,275</div><div class="kpi-label">Pipeline Value</div><div class="kpi-note">Revenue at risk</div></div>
+      <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">0</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">2</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">3d</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Since appointment</div></div>
+    </div>
+  </div>
+
+  <div class="period-panel" id="panel-30d">
+    <div class="kpi-grid">
+      <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">21</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Appt within last 30 days</div></div>
+      <div class="kpi-card green"><div class="kpi-icon">💰</div><div class="kpi-value" style="color:var(--green)">$161,398</div><div class="kpi-label">Pipeline Value</div><div class="kpi-note">Revenue at risk</div></div>
+      <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">14</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">10</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">15d</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Since appointment</div></div>
+    </div>
+  </div>
+
+  <div class="period-panel" id="panel-60d">
+    <div class="kpi-grid">
+      <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">46</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Appt within last 60 days</div></div>
+      <div class="kpi-card green"><div class="kpi-icon">💰</div><div class="kpi-value" style="color:var(--green)">$366,443</div><div class="kpi-label">Pipeline Value</div><div class="kpi-note">Revenue at risk</div></div>
+      <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">39</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">29</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">31d</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Since appointment</div></div>
+    </div>
+  </div>
+
+  <div class="period-panel active" id="panel-90d">
+    <div class="kpi-grid">
+      <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">72</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Appt within last 90 days</div></div>
+      <div class="kpi-card green"><div class="kpi-icon">💰</div><div class="kpi-value" style="color:var(--green)">$596,745</div><div class="kpi-label">Pipeline Value</div><div class="kpi-note">Revenue at risk</div></div>
+      <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">65</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">49</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">47d</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Since appointment</div></div>
+    </div>
+  </div>
+
+  <div class="section-heading" style="margin-top:8px;">📋 All Unclosed Estimates — Click to Expand Details</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Sorted by estimate value (highest first) &nbsp;·&nbsp; 72 total &nbsp;·&nbsp; $596,745 total pipeline</div>
+  <div class="accordion-grid">
+
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15711 — Fabiola Valerio</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-20 (25d ago) &nbsp;·&nbsp; Cartersville</div>
+        </div>
+        <span class="acc-pill red">$34,500</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$34,500</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">25d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Goodman Option 1 (Upstairs) Horizontal ; Goodman Option 2 (Downstairs) Upflow; Goodman Option 3 (Dow<br>
+          <strong>Phone:</strong> (470) 703-1756 &nbsp;·&nbsp; <strong>Address:</strong> 171 Mayflower Cir, Cartersville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15559 — Steve Park</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-06 (69d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill red">$27,696</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$27,696</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">69d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1; Option #1 Current Setup; Option #3 Full System Replacement With New Goodman System<br>
+          <strong>Phone:</strong> (202) 236-5817 &nbsp;·&nbsp; <strong>Address:</strong> 9566 Lakeview Ct, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15749 — Brenda Pearson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-26 (19d ago) &nbsp;·&nbsp; Hiram</div>
+        </div>
+        <span class="acc-pill red">$24,280</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$24,280</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">19d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option#1 Current Setup Carrier All Electic System; Option#2 Current Setup Trane Option<br>
+          <strong>Phone:</strong> (404) 452-5577 &nbsp;·&nbsp; <strong>Address:</strong> 96 Lynn Dr, Hiram
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-green" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
+      <div class="acc-header" style="background:#f0fdf4">
+        <div class="acc-icon green">💰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15818 — Ahoud Alwarsh</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-09 (5d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill green">$24,000</span>
+        <span class="badge badge-green">🟢 High Value</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$24,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">5d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> 3 1/2 Ton Setup (Upstairs)<br>
+          <strong>Phone:</strong> (937) 546-8228 &nbsp;·&nbsp; <strong>Address:</strong> 4920 Apple way ct, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15486 — Kim Henkle</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-21 (85d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill red">$20,250</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$20,250</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">85d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (706) 974-8057 &nbsp;·&nbsp; <strong>Address:</strong> 212 Cedar Woods Way, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15545 — Joe Omer</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-02 (73d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill red">$19,401</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$19,401</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">73d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1 Evaporator Coil Replacement; Option #1 Current Setup; Option #2 Current Setup<br>
+          <strong>Phone:</strong> (678) 628-3626 &nbsp;·&nbsp; <strong>Address:</strong> 112 American Pharoah Wy, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15773 — Lechristian Mcture</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-30 (16d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill red">$19,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$19,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">16d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #2 Current Setup; Copy of Option #1 Current Setup<br>
+          <strong>Phone:</strong> (404) 780-3057 &nbsp;·&nbsp; <strong>Address:</strong> 6537 Biscayne Way, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15678 — Jennifer Walloch</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-14 (31d ago) &nbsp;·&nbsp; Mableton</div>
+        </div>
+        <span class="acc-pill red">$18,500</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$18,500</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">31d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 877-8512 &nbsp;·&nbsp; <strong>Address:</strong> 5980 Haddon Pl SE, Mableton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15628 — Bob Patel</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-23 (52d ago) &nbsp;·&nbsp; Cumming</div>
+        </div>
+        <span class="acc-pill red">$18,200</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$18,200</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">52d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1 3 ton ; Option #2 2.5 ton <br>
+          <strong>Phone:</strong> (470) 525-7080 &nbsp;·&nbsp; <strong>Address:</strong> 5424 Landsdowne Court, Cumming
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15586 — Scott Clement</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-11 (65d ago) &nbsp;·&nbsp; Smyrna</div>
+        </div>
+        <span class="acc-pill red">$16,349</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$16,349</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">65d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1 Goodman 1 Stage system; Option #1 Current Setup<br>
+          <strong>Phone:</strong> (404) 274-9237 &nbsp;·&nbsp; <strong>Address:</strong> 4002 Rhyne Cir, Smyrna
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15553 — Andrew Simpson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-06 (69d ago) &nbsp;·&nbsp; Dallas</div>
+        </div>
+        <span class="acc-pill red">$15,294</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$15,294</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">69d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (608) 400-1434 &nbsp;·&nbsp; <strong>Address:</strong> 180 Eagle Bound Path, Dallas
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15769 — Jaime Hayes</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-01 (13d ago) &nbsp;·&nbsp; Cumming</div>
+        </div>
+        <span class="acc-pill red">$14,994</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$14,994</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">13d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Upstairs; Option #2 Current Setup<br>
+          <strong>Phone:</strong> (719) 439-8831 &nbsp;·&nbsp; <strong>Address:</strong> 4060 Delamar Dr, Cumming
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15687 — Tony Volrath</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-13 (32d ago) &nbsp;·&nbsp; Mableton</div>
+        </div>
+        <span class="acc-pill red">$14,717</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$14,717</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">32d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 356-8988 &nbsp;·&nbsp; <strong>Address:</strong> 4490 Kinvarra Cir, Mableton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15499 — Gloria Lawrence</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-24 (82d ago) &nbsp;·&nbsp; Stone Mountain</div>
+        </div>
+        <span class="acc-pill red">$13,836</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$13,836</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">82d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1; Option #2 Goodman<br>
+          <strong>Phone:</strong> (678) 571-9659 &nbsp;·&nbsp; <strong>Address:</strong> 5359 Kelleys Creek Dr, Stone Mountain
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15560 — Sandra Walker Gatewood</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-07 (68d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill red">$12,049</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$12,049</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">68d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 697-3192 &nbsp;·&nbsp; <strong>Address:</strong> 3619 Craggy Perch, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15672 — Ray Joo</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-07 (38d ago) &nbsp;·&nbsp; Duluth</div>
+        </div>
+        <span class="acc-pill red">$12,001</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$12,001</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">38d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 687-3098 &nbsp;·&nbsp; <strong>Address:</strong> 2051 Fosco Dr NW, Duluth
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15688 — Joseph Wilson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-08 (37d ago) &nbsp;·&nbsp; Powder Springs</div>
+        </div>
+        <span class="acc-pill red">$12,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$12,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">37d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1 Current Setup<br>
+          <strong>Phone:</strong> (231) 903-3223 &nbsp;·&nbsp; <strong>Address:</strong> 4469 Karron Dr, Powder Springs
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15478 — Carnell Anderson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-20 (86d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill red">$11,009</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$11,009</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">86d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 559-9025 &nbsp;·&nbsp; <strong>Address:</strong> 2980 Sable Trl, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15514 — Zach Gwinn</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-23 (83d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill red">$11,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$11,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">83d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 435-3349 &nbsp;·&nbsp; <strong>Address:</strong> 1710 Summit Glen Ln NE, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15646 — Travis Orszulak</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-27 (48d ago) &nbsp;·&nbsp; Pooler</div>
+        </div>
+        <span class="acc-pill red">$10,912</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,912</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">48d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (413) 237-4233 &nbsp;·&nbsp; <strong>Address:</strong> 115 Canal St, Pooler
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15660 — Kevin L Weikum</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-05 (40d ago) &nbsp;·&nbsp; Kennesaw</div>
+        </div>
+        <span class="acc-pill red">$10,800</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,800</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">40d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 312-2598 &nbsp;·&nbsp; <strong>Address:</strong> 19 Latimer Ln NE, Kennesaw
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15635 — James Nelson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-24 (51d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill red">$10,728</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,728</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">51d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 438-7168 &nbsp;·&nbsp; <strong>Address:</strong> 5113 Chapel Crossing Rd, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15716 — Stacy Nipper</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-20 (25d ago) &nbsp;·&nbsp; Acworth</div>
+        </div>
+        <span class="acc-pill red">$10,649</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,649</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">25d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 778-6413 &nbsp;·&nbsp; <strong>Address:</strong> 413 Christina Way, Acworth
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15476 — Debebe Lambmo</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-19 (87d ago) &nbsp;·&nbsp; Stone Mountain</div>
+        </div>
+        <span class="acc-pill red">$10,050</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,050</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">87d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (478) 336-6410 &nbsp;·&nbsp; <strong>Address:</strong> 4072 Bontura Ct, Stone Mountain
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15680 — Rajesh Selvam</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-08 (37d ago) &nbsp;·&nbsp; Lawrenceville</div>
+        </div>
+        <span class="acc-pill red">$10,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$10,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">37d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (214) 636-1435 &nbsp;·&nbsp; <strong>Address:</strong> 628 Princeton Elm Pl, Lawrenceville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15611 — Ann Fields</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-18 (57d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill red">$9,880</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,880</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">57d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 790-5781 &nbsp;·&nbsp; <strong>Address:</strong> 2671 Alberta Ln, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15605 — Juan esparza esparza</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-16 (59d ago) &nbsp;·&nbsp; Cartersville</div>
+        </div>
+        <span class="acc-pill red">$9,744</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,744</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">59d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 939-6861 &nbsp;·&nbsp; <strong>Address:</strong> 28 Martin Luther King Junior Drive, Cartersville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15571 — Angie Nelson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-09 (67d ago) &nbsp;·&nbsp; Dallas</div>
+        </div>
+        <span class="acc-pill red">$9,703</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,703</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">67d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (470) 362-9464 &nbsp;·&nbsp; <strong>Address:</strong> 126 Southwind Drive, Dallas
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15778 — Randy Askea</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-29 (16d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill red">$9,450</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,450</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">16d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 331-5296 &nbsp;·&nbsp; <strong>Address:</strong> 1432 Arden Drive, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15703 — Sashi Vasu</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-14 (31d ago) &nbsp;·&nbsp; Alpharetta</div>
+        </div>
+        <span class="acc-pill red">$9,387</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,387</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">31d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 404-0080 &nbsp;·&nbsp; <strong>Address:</strong> 467 Grayson Way, Alpharetta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15623 — James N Christy Davis</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-26 (49d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill red">$9,300</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,300</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">49d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 735-3577 &nbsp;·&nbsp; <strong>Address:</strong> 340 Lewis Manous Ln, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15626 — Joe Hernandez</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-21 (54d ago) &nbsp;·&nbsp; Kennesaw</div>
+        </div>
+        <span class="acc-pill red">$9,199</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$9,199</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">54d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 281-6594 &nbsp;·&nbsp; <strong>Address:</strong> 370 Morgans Creek Court Northwest, Kennesaw
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15588 — Darren Rogers</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-11 (64d ago) &nbsp;·&nbsp; East Point</div>
+        </div>
+        <span class="acc-pill red">$8,800</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$8,800</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">64d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (470) 382-2601 &nbsp;·&nbsp; <strong>Address:</strong> 3143 Green Valley Dr, East Point
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15705 — Faheem Shujauddin</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-14 (31d ago) &nbsp;·&nbsp; Lilburn</div>
+        </div>
+        <span class="acc-pill red">$8,595</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$8,595</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">31d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 333-8667 &nbsp;·&nbsp; <strong>Address:</strong> 274 Newport Rd SW, Lilburn
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15726 — Kate Okoyomo Ibharalu</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-21 (24d ago) &nbsp;·&nbsp; Douglasville</div>
+        </div>
+        <span class="acc-pill red">$8,550</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$8,550</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">24d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 317-4275 &nbsp;·&nbsp; <strong>Address:</strong> 4040 San Marco Way, Douglasville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15620 — Emmett Shead</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-21 (54d ago) &nbsp;·&nbsp; Powder Springs</div>
+        </div>
+        <span class="acc-pill red">$8,480</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$8,480</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">54d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option#1 Current Setup<br>
+          <strong>Phone:</strong> (404) 579-1938 &nbsp;·&nbsp; <strong>Address:</strong> 2506 Greenes Lane, Powder Springs
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15701 — Chris Hyunkyung</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-14 (31d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill red">$8,038</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$8,038</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">31d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (516) 289-1012 &nbsp;·&nbsp; <strong>Address:</strong> 1089 Seven Springs Cir NE, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15518 — Dave Levin</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-27 (79d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill red">$7,997</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,997</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">79d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (202) 345-0082 &nbsp;·&nbsp; <strong>Address:</strong> 1642 Runnymeade Road Northeast, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15474 — Susan Loudermilk</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-17 (89d ago) &nbsp;·&nbsp; Powder Springs</div>
+        </div>
+        <span class="acc-pill red">$7,775</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,775</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">89d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 595-0145 &nbsp;·&nbsp; <strong>Address:</strong> 4314 Compton Circle, Powder Springs
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15775 — Jerry Bowen</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-04 (10d ago) &nbsp;·&nbsp; Decatur</div>
+        </div>
+        <span class="acc-pill red">$7,675</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,675</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">10d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 844-3897 &nbsp;·&nbsp; <strong>Address:</strong> 2048 Wesley Chapel Rd, Decatur
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15653 — Dave Peeples</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-29 (46d ago) &nbsp;·&nbsp; Taylorsville</div>
+        </div>
+        <span class="acc-pill red">$7,567</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,567</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">46d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (706) 537-7005 &nbsp;·&nbsp; <strong>Address:</strong> 12 Cherrywood Way, Taylorsville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-green" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
+      <div class="acc-header" style="background:#f0fdf4">
+        <div class="acc-icon green">💰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15828 — Lucia Usery</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-11 (3d ago) &nbsp;·&nbsp; —</div>
+        </div>
+        <span class="acc-pill green">$7,275</span>
+        <span class="badge badge-green">🟢 High Value</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,275</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">3d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 808-3023 &nbsp;·&nbsp; <strong>Address:</strong> —, —
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15570 — Joyce Gibbs</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-06 (69d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill red">$7,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$7,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">69d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 881-1950 &nbsp;·&nbsp; <strong>Address:</strong> 403 Barrington Hills Dr, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15690 — Shawanda Twine</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-13 (32d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill red">$6,997</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$6,997</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">32d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 895-8645 &nbsp;·&nbsp; <strong>Address:</strong> 2833 Stonewall Ln SW, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15512 — Russ Martin</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-25 (81d ago) &nbsp;·&nbsp; Powder Springs</div>
+        </div>
+        <span class="acc-pill red">$6,840</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$6,840</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">81d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (218) 464-2236 &nbsp;·&nbsp; <strong>Address:</strong> 3793 Jack Vernon Cir, Powder Springs
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15581 — Robert Hoffman</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-08 (67d ago) &nbsp;·&nbsp; Roswell</div>
+        </div>
+        <span class="acc-pill red">$6,503</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$6,503</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">67d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 270-8264 &nbsp;·&nbsp; <strong>Address:</strong> 1190 Northshore Drive, Roswell
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15538 — James Val</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-01 (74d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill red">$5,800</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$5,800</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">74d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 650-0764 &nbsp;·&nbsp; <strong>Address:</strong> 328 Woodbrook Crest, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15520 — Dan Dinh</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-26 (80d ago) &nbsp;·&nbsp; Jonesboro</div>
+        </div>
+        <span class="acc-pill red">$5,750</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$5,750</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">80d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 451-6569 &nbsp;·&nbsp; <strong>Address:</strong> 1374 Tara Road, Jonesboro
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+      <div class="acc-header" style="background:#fff1f2">
+        <div class="acc-icon red">🚨</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15488 — Walter Fuller</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-20 (86d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill red">$5,000</span>
+        <span class="badge badge-red">🔴 High Priority</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">$5,000</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">86d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">declined</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 316-3896 &nbsp;·&nbsp; <strong>Address:</strong> 3055 Antler Trail, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15485 — Reverend James King</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-19 (87d ago) &nbsp;·&nbsp; Loganville</div>
+        </div>
+        <span class="acc-pill yellow">$2,200</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$2,200</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">87d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 600-4995 &nbsp;·&nbsp; <strong>Address:</strong> 1258 Tumblerock Ct, Loganville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15697 — RGI RGI</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-15 (30d ago) &nbsp;·&nbsp; Lithonia</div>
+        </div>
+        <span class="acc-pill yellow">$1,025</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$1,025</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">30d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 574-5009 &nbsp;·&nbsp; <strong>Address:</strong> 6198 Hyde Park Ln, Lithonia
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+      <div class="acc-header" style="background:#ffffff">
+        <div class="acc-icon blue">📋</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15838 — Tyrone Dawn</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-13 (1d ago) &nbsp;·&nbsp; Decatur</div>
+        </div>
+        <span class="acc-pill blue">$0</span>
+        <span class="badge badge-gray">⚪ Monitor</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">1d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 859-0499 &nbsp;·&nbsp; <strong>Address:</strong> 4879 Haymarket Trail, Decatur
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+      <div class="acc-header" style="background:#ffffff">
+        <div class="acc-icon blue">📋</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15805 — James Coles</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-12 (2d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill blue">$0</span>
+        <span class="badge badge-gray">⚪ Monitor</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">2d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 917-9684 &nbsp;·&nbsp; <strong>Address:</strong> 223 Fountain Oak Way, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+      <div class="acc-header" style="background:#ffffff">
+        <div class="acc-icon blue">📋</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15824 — Fred Gebaher</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-11 (3d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill blue">$0</span>
+        <span class="badge badge-gray">⚪ Monitor</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">3d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 797-9944 &nbsp;·&nbsp; <strong>Address:</strong> 4553 Mt Paran Pkwy NW, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+      <div class="acc-header" style="background:#ffffff">
+        <div class="acc-icon blue">📋</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15833 — Maria Bermudez</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-10 (4d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill blue">$0</span>
+        <span class="badge badge-gray">⚪ Monitor</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">4d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 376-6125 &nbsp;·&nbsp; <strong>Address:</strong> 3029 Coach Lane, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+      <div class="acc-header" style="background:#ffffff">
+        <div class="acc-icon blue">📋</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15809 — Nancy Vetterick McElligott</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-06-08 (6d ago) &nbsp;·&nbsp; Alpharetta</div>
+        </div>
+        <span class="acc-pill blue">$0</span>
+        <span class="badge badge-gray">⚪ Monitor</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#0e9f6e">6d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (770) 310-3505 &nbsp;·&nbsp; <strong>Address:</strong> 2900 Arborwoods Dr, Alpharetta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15770 — Richardo Rivera</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-28 (17d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">17d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (321) 258-7567 &nbsp;·&nbsp; <strong>Address:</strong> 390 17th St NW, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15730 — Danny Young</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-21 (24d ago) &nbsp;·&nbsp; Smyrna</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">24d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 295-4252 &nbsp;·&nbsp; <strong>Address:</strong> 4355 Cooper Oaks Dr SE, Smyrna
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15721 — Jesse Eniss</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-20 (25d ago) &nbsp;·&nbsp; Lawrenceville</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">25d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 361-4918 &nbsp;·&nbsp; <strong>Address:</strong> 1802 Alcovy Springs Ln, Lawrenceville
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15720 — Jonathan Engd</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-20 (25d ago) &nbsp;·&nbsp; Woodstock</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">25d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (301) 467-1530 &nbsp;·&nbsp; <strong>Address:</strong> 114 Haleys Cir, Woodstock
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15718 — Suresh Taneja</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-18 (27d ago) &nbsp;·&nbsp; Tucker</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">27d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">pending</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 777-5786 &nbsp;·&nbsp; <strong>Address:</strong> 124 Thorncrest Court, Tucker
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15684 — Jason Jolly</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-11 (34d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">34d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 938-0812 &nbsp;·&nbsp; <strong>Address:</strong> 2505 Canopy Ct, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15673 — Vu nguyen</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-05-06 (39d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">39d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 824-1696 &nbsp;·&nbsp; <strong>Address:</strong> 1472 Lavista Rd NE, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15627 — RGI RGI</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-23 (52d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">52d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 574-5009 &nbsp;·&nbsp; <strong>Address:</strong> 732 Chadsford Road, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15630 — Keaughn Caver</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-22 (53d ago) &nbsp;·&nbsp; Atlanta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">53d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 692-2910 &nbsp;·&nbsp; <strong>Address:</strong> 4606 Ivy Gate Circle Southeast, Atlanta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15482 — Christine Phan</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-22 (53d ago) &nbsp;·&nbsp; Smyrna</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">53d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (912) 659-5620 &nbsp;·&nbsp; <strong>Address:</strong> 1802 Dunrobin Dr SE, Smyrna
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15607 — Kimberly Watson</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-17 (58d ago) &nbsp;·&nbsp; Powder Springs</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">58d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (610) 470-1144 &nbsp;·&nbsp; <strong>Address:</strong> 2250 Noelle Pl, Powder Springs
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15537 — Jason Moore</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-02 (73d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">73d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 852-7010 &nbsp;·&nbsp; <strong>Address:</strong> 1747 Hazelwood Drive Southeast, Marietta
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15531 — Alva Eddison</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-04-01 (74d ago) &nbsp;·&nbsp; Smyrna</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">74d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (678) 576-2590 &nbsp;·&nbsp; <strong>Address:</strong> 4500 W Village Pl, Smyrna
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15524 — Jim Devlin</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-31 (75d ago) &nbsp;·&nbsp; Kennesaw</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">75d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (928) 892-9635 &nbsp;·&nbsp; <strong>Address:</strong> 3393 Palm Cir, Kennesaw
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15523 — Dennis Reardon</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-27 (79d ago) &nbsp;·&nbsp; Canton</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">79d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 436-3866 &nbsp;·&nbsp; <strong>Address:</strong> 400 Canyon Lane, Canton
+        </div>
+      </div>
+    </div>
+    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+      <div class="acc-header" style="background:#fefce8">
+        <div class="acc-icon yellow">⏰</div>
+        <div class="acc-meta">
+          <div class="acc-title">#15513 — John Pyles</div>
+          <div class="acc-sub">Unassigned &nbsp;·&nbsp; Appt: 2026-03-25 (81d ago) &nbsp;·&nbsp; Marietta</div>
+        </div>
+        <span class="acc-pill yellow">$0</span>
+        <span class="badge badge-yellow">🟡 Follow-Up</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="job-stats">
+          <div class="job-stat"><div class="job-stat-val" style="color:#1a56db">$0</div><div class="job-stat-lbl">Est. Value</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#dc2626">81d</div><div class="job-stat-lbl">Days Since Appt</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">Unassigned</div><div class="job-stat-lbl">Assigned Tech</div></div>
+          <div class="job-stat"><div class="job-stat-val" style="color:#6b7280;font-size:14px">expired</div><div class="job-stat-lbl">Option Status</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:13px;color:#374151;">
+          <strong>Description:</strong> Option #1<br>
+          <strong>Phone:</strong> (404) 786-8212 &nbsp;·&nbsp; <strong>Address:</strong> 307 Chase Ln, Marietta
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <strong>Wright AI Labs — Business Intelligence (BI) Platform</strong> &nbsp;·&nbsp; wrightailabs.com &nbsp;·&nbsp; Confidential — For Internal Use Only &nbsp;·&nbsp; Data: HCP via Mr. Griffin Agent
+</div>
+
+<script>
+  function toggle(card){ card.classList.toggle('open'); }
+  function switchPeriod(period, tab){
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.period-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + period).classList.add('active');
+  }
+</script>
+</body>
+</html>
