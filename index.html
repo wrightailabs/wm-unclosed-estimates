@@ -124,14 +124,14 @@
 
   <div class="section-heading">📊 Pipeline Summary — Select Lookback Period</div>
   <div class="period-tabs">
-    <div class="period-tab" onclick="switchPeriod('7d',this)">Last 7 Days</div>
+    <div class="period-tab active" onclick="switchPeriod('7d',this)">Last 7 Days</div>
     <div class="period-tab" onclick="switchPeriod('30d',this)">Last 30 Days</div>
     <div class="period-tab" onclick="switchPeriod('60d',this)">Last 60 Days</div>
-    <div class="period-tab active" onclick="switchPeriod('90d',this)">Last 90 Days</div>
+    <div class="period-tab" onclick="switchPeriod('90d',this)">Last 90 Days</div>
     <div class="period-tab" onclick="switchPeriod('all',this)">All Time</div>
   </div>
 
-  <div class="period-panel" id="panel-7d">
+  <div class="period-panel active" id="panel-7d">
     <div class="kpi-grid">
       <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">7</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Estimates within 7 days</div></div>
       <div class="kpi-card yellow"><div class="kpi-icon">⏰</div><div class="kpi-value" style="color:#b45309">0</div><div class="kpi-label">Expired Estimates</div><div class="kpi-note">Estimates ≥ 30 days old</div></div>
@@ -167,7 +167,7 @@
     </div>
   </div>
 
-  <div class="period-panel active" id="panel-90d">
+  <div class="period-panel" id="panel-90d">
     <div class="kpi-grid">
       <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">72</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">Estimates within 90 days</div></div>
       <div class="kpi-card yellow"><div class="kpi-icon">⏰</div><div class="kpi-value" style="color:#b45309">53</div><div class="kpi-label">Expired Estimates</div><div class="kpi-note">Estimates ≥ 30 days old</div></div>
