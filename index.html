@@ -121,6 +121,7 @@
     <div class="period-tab" onclick="switchPeriod('30d',this)">Last 30 Days</div>
     <div class="period-tab" onclick="switchPeriod('60d',this)">Last 60 Days</div>
     <div class="period-tab active" onclick="switchPeriod('90d',this)">Last 90 Days</div>
+    <div class="period-tab" onclick="switchPeriod('all',this)">All Time</div>
   </div>
 
   <div class="period-panel" id="panel-7d">
@@ -160,6 +161,16 @@
       <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">65</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
       <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">49</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
       <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">47d</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Since appointment</div></div>
+    </div>
+  </div>
+
+  <div class="period-panel" id="panel-all">
+    <div class="kpi-grid">
+      <div class="kpi-card orange"><div class="kpi-icon">📋</div><div class="kpi-value" style="color:var(--orange)">562</div><div class="kpi-label">Unclosed Estimates</div><div class="kpi-note">All time — full HCP history</div></div>
+      <div class="kpi-card green"><div class="kpi-icon">💰</div><div class="kpi-value" style="color:var(--green)">$3.9M</div><div class="kpi-label">Pipeline Value</div><div class="kpi-note">Total revenue at risk</div></div>
+      <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-value" style="color:var(--red)">490</div><div class="kpi-label">Needs Follow-Up</div><div class="kpi-note">7+ days since appt</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon">🏆</div><div class="kpi-value" style="color:var(--blue)">189</div><div class="kpi-label">High Value (≥$5K)</div><div class="kpi-note">Priority closes</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon">📅</div><div class="kpi-value" style="color:var(--purple)">—</div><div class="kpi-label">Avg Days Open</div><div class="kpi-note">Full history</div></div>
     </div>
   </div>
 
