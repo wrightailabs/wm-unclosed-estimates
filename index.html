@@ -1920,12 +1920,83 @@
 
 </div>
 
+  <!-- ========== TEAM MEMBERS SECTION ========== -->
+  <div class="section-heading" style="margin-top:32px;">👥 Team Members</div>
+
+  <div style="background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;">
+    <!-- Parent toggle button -->
+    <div onclick="this.parentElement.classList.toggle('tm-open')" style="padding:16px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;background:var(--navy);color:white;border-radius:12px 12px 0 0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:22px">👥</span>
+        <div>
+          <div style="font-size:15px;font-weight:700">Team Members</div>
+          <div style="font-size:12px;opacity:.7;margin-top:2px">Click to view team — select a member to open in HCP</div>
+        </div>
+      </div>
+      <span style="font-size:18px;transition:transform .25s" class="tm-chevron">▾</span>
+    </div>
+
+    <div class="tm-body" style="display:none;padding:20px;">
+
+      <!-- Admins -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Admins</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+        <a href="https://app.housecallpro.com/pro/schedule?employee=bhunter" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--blue-light);border:2px solid var(--blue);border-radius:8px;font-weight:700;font-size:14px;color:var(--blue);cursor:pointer;transition:all .15s">Bhunter</div>
+        </a>
+        <a href="https://app.housecallpro.com/pro/schedule?employee=cbarton" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--blue-light);border:2px solid var(--blue);border-radius:8px;font-weight:700;font-size:14px;color:var(--blue);cursor:pointer;transition:all .15s">Cbarton</div>
+        </a>
+        <a href="https://app.housecallpro.com/pro/schedule?employee=jholder" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--blue-light);border:2px solid var(--blue);border-radius:8px;font-weight:700;font-size:14px;color:var(--blue);cursor:pointer;transition:all .15s">Jholder</div>
+        </a>
+      </div>
+
+      <!-- Office -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Office</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+        <a href="https://app.housecallpro.com/pro/schedule?employee=ben+faust" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--green-light);border:2px solid var(--green);border-radius:8px;font-weight:700;font-size:14px;color:var(--green);cursor:pointer;transition:all .15s">Ben Faust</div>
+        </a>
+        <a href="https://app.housecallpro.com/pro/schedule?employee=sheila+jackson" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--green-light);border:2px solid var(--green);border-radius:8px;font-weight:700;font-size:14px;color:var(--green);cursor:pointer;transition:all .15s">Sheila Jackson</div>
+        </a>
+      </div>
+
+      <!-- Sales & Service -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Sales &amp; Service</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <a href="https://app.housecallpro.com/pro/schedule?employee=janet" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--purple-light);border:2px solid var(--purple);border-radius:8px;font-weight:700;font-size:14px;color:var(--purple);cursor:pointer;transition:all .15s">Janet</div>
+        </a>
+        <a href="https://app.housecallpro.com/pro/schedule?employee=victor" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--purple-light);border:2px solid var(--purple);border-radius:8px;font-weight:700;font-size:14px;color:var(--purple);cursor:pointer;transition:all .15s">Victor</div>
+        </a>
+        <a href="https://app.housecallpro.com/pro/schedule?employee=josh" target="_blank" style="text-decoration:none">
+          <div style="padding:10px 20px;background:var(--purple-light);border:2px solid var(--purple);border-radius:8px;font-weight:700;font-size:14px;color:var(--purple);cursor:pointer;transition:all .15s">Josh</div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+  <!-- ========== END TEAM MEMBERS ========== -->
+
 <div class="footer">
   <strong>Wright AI Labs — Business Intelligence (BI) Platform</strong> &nbsp;·&nbsp; wrightailabs.com &nbsp;·&nbsp; Confidential — For Internal Use Only &nbsp;·&nbsp; Data: HCP via Mr. Griffin Agent
 </div>
 
 <script>
   function toggle(card){ card.classList.toggle('open'); }
+  // Team Members toggle
+  document.querySelectorAll('[onclick*="tm-open"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const body = this.parentElement.querySelector('.tm-body');
+      const chevron = this.querySelector('.tm-chevron');
+      const isOpen = this.parentElement.classList.contains('tm-open');
+      body.style.display = isOpen ? 'none' : 'block';
+      chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+    });
+  });
   function switchPeriod(period, tab){
     document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.period-panel').forEach(p => p.classList.remove('active'));
