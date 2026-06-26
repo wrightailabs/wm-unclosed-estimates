@@ -1983,6 +1983,8 @@
 <script>
   function toggle(card){ card.classList.toggle('open'); }
   // ── Drill-down filter ──
+  let activePeriodDays = 7; // default matches 7d tab
+
   function filterEstimates(label, testFn) {
     const cards = document.querySelectorAll('.acc-card[data-days]');
     let shown = 0;
@@ -2011,23 +2013,30 @@
 
   // Attach drill-down to each KPI card in every panel
   document.querySelectorAll('.period-panel').forEach(panel => {
+    const panelId = panel.id; // e.g. panel-7d, panel-30d, panel-all
+    const periodLimit = panelId === 'panel-7d' ? 7
+      : panelId === 'panel-30d' ? 30
+      : panelId === 'panel-60d' ? 60
+      : panelId === 'panel-90d' ? 90
+      : 99999; // all time
+
     const cards = panel.querySelectorAll('.kpi-card');
     cards.forEach(card => {
       const label = card.querySelector('.kpi-label')?.textContent?.trim() || '';
       if (label.includes('Unclosed Estimates')) {
-        card.onclick = () => kpiClick(card, 'All Unclosed Estimates', (d,v,s) => true);
+        card.onclick = () => kpiClick(card, `Unclosed Estimates — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d <= periodLimit);
       } else if (label.includes('Expired Estimates')) {
-        card.onclick = () => kpiClick(card, 'Expired Estimates (≥30 days)', (d,v,s) => d >= 30);
+        card.onclick = () => kpiClick(card, `Expired Estimates — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d >= 30 && d <= periodLimit);
       } else if (label.includes('Pipeline Value')) {
-        card.onclick = () => kpiClick(card, 'All Pipeline Estimates', (d,v,s) => true);
+        card.onclick = () => kpiClick(card, `Pipeline — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d <= periodLimit);
       } else if (label.includes('Urgent Follow-Up')) {
-        card.onclick = () => kpiClick(card, 'Urgent Follow-Up (30+ days)', (d,v,s) => d >= 30);
+        card.onclick = () => kpiClick(card, `Urgent Follow-Up — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d >= 30 && d <= periodLimit);
       } else if (label.includes('Needs Follow-Up')) {
-        card.onclick = () => kpiClick(card, 'Needs Follow-Up (14+ days)', (d,v,s) => d >= 14);
+        card.onclick = () => kpiClick(card, `Needs Follow-Up — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d >= 14 && d <= periodLimit);
       } else if (label.includes('High Value')) {
-        card.onclick = () => kpiClick(card, 'High Value (≥$1K)', (d,v,s) => v >= 1000);
+        card.onclick = () => kpiClick(card, `High Value (≥$1K) — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => v >= 1000 && d <= periodLimit);
       } else if (label.includes('Avg Days Open')) {
-        card.onclick = () => kpiClick(card, 'All Estimates by Age', (d,v,s) => true);
+        card.onclick = () => kpiClick(card, `All Estimates — Last ${periodLimit === 99999 ? 'All Time' : periodLimit + ' Days'}`, (d,v,s) => d <= periodLimit);
       }
     });
   });
