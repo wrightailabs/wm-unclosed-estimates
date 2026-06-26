@@ -75,6 +75,13 @@
     .legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:white;border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:16px}
     .footer{background:var(--navy);color:rgba(255,255,255,.6);text-align:center;padding:14px;font-size:11px;margin-top:32px}
     .footer strong{color:rgba(255,255,255,.9)}
+    .kpi-card{cursor:pointer;transition:transform .15s,box-shadow .15s}
+    .kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    .kpi-card.active-filter{outline:3px solid var(--blue);outline-offset:2px}
+    .filter-bar{display:none;align-items:center;gap:10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--blue)}
+    .filter-bar.visible{display:flex}
+    .filter-bar button{margin-left:auto;background:white;border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer}
+    .acc-card.hidden{display:none}
     @media(max-width:600px){
       .kpi-grid{grid-template-columns:repeat(2,1fr)}
       .header-title{font-size:16px}
@@ -185,10 +192,14 @@
   </div>
 
   <div class="section-heading" style="margin-top:8px;">📋 All Unclosed Estimates — Click to Expand Details</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Sorted by estimate value (highest first) &nbsp;·&nbsp; 72 total &nbsp;·&nbsp; $596,745 total pipeline</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Sorted by estimate value (highest first) &nbsp;·&nbsp; 72 total &nbsp;·&nbsp; $596,745 total pipeline &nbsp;·&nbsp; <em>Click any panel card above to filter</em></div>
+  <div class="filter-bar" id="filter-bar">
+    <span id="filter-label">🔍 Showing all</span>
+    <button onclick="clearFilter()">✕ Clear Filter</button>
+  </div>
   <div class="accordion-grid">
 
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="25" data-value="34500" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -212,7 +223,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="69" data-value="27696" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -236,7 +247,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="19" data-value="24280" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -260,7 +271,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-green" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
+    <div class="acc-card" data-days="5" data-value="24000" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
       <div class="acc-header" style="background:#f0fdf4">
         <div class="acc-icon green">💰</div>
         <div class="acc-meta">
@@ -284,7 +295,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="85" data-value="20250" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -308,7 +319,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="73" data-value="19401" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -332,7 +343,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="16" data-value="19000" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -356,7 +367,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="31" data-value="18500" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -380,7 +391,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="52" data-value="18200" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -404,7 +415,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="65" data-value="16349" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -428,7 +439,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="69" data-value="15294" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -452,7 +463,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="13" data-value="14994" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -476,7 +487,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="32" data-value="14717" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -500,7 +511,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="82" data-value="13836" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -524,7 +535,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="68" data-value="12049" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -548,7 +559,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="38" data-value="12001" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -572,7 +583,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="37" data-value="12000" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -596,7 +607,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="86" data-value="11009" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -620,7 +631,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="83" data-value="11000" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -644,7 +655,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="48" data-value="10912" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -668,7 +679,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="40" data-value="10800" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -692,7 +703,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="51" data-value="10728" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -716,7 +727,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="25" data-value="10649" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -740,7 +751,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="87" data-value="10050" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -764,7 +775,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="37" data-value="10000" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -788,7 +799,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="57" data-value="9880" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -812,7 +823,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="59" data-value="9744" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -836,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="67" data-value="9703" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -860,7 +871,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="16" data-value="9450" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -884,7 +895,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="31" data-value="9387" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -908,7 +919,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="49" data-value="9300" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -932,7 +943,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="54" data-value="9199" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -956,7 +967,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="64" data-value="8800" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -980,7 +991,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="31" data-value="8595" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1004,7 +1015,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="24" data-value="8550" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1028,7 +1039,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="54" data-value="8480" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1052,7 +1063,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="31" data-value="8038" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1076,7 +1087,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="79" data-value="7997" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1100,7 +1111,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="89" data-value="7775" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1124,7 +1135,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="10" data-value="7675" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1148,7 +1159,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="46" data-value="7567" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1172,7 +1183,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-green" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
+    <div class="acc-card" data-days="3" data-value="7275" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #0e9f6e">
       <div class="acc-header" style="background:#f0fdf4">
         <div class="acc-icon green">💰</div>
         <div class="acc-meta">
@@ -1196,7 +1207,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="69" data-value="7000" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1220,7 +1231,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="32" data-value="6997" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1244,7 +1255,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="81" data-value="6840" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1268,7 +1279,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="67" data-value="6503" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1292,7 +1303,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="74" data-value="5800" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1316,7 +1327,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="80" data-value="5750" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1340,7 +1351,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-red" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
+    <div class="acc-card" data-days="86" data-value="5000" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #dc2626">
       <div class="acc-header" style="background:#fff1f2">
         <div class="acc-icon red">🚨</div>
         <div class="acc-meta">
@@ -1364,7 +1375,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="87" data-value="2200" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1388,7 +1399,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="30" data-value="1025" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1412,7 +1423,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+    <div class="acc-card" data-days="1" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
       <div class="acc-header" style="background:#ffffff">
         <div class="acc-icon blue">📋</div>
         <div class="acc-meta">
@@ -1436,7 +1447,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+    <div class="acc-card" data-days="2" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
       <div class="acc-header" style="background:#ffffff">
         <div class="acc-icon blue">📋</div>
         <div class="acc-meta">
@@ -1460,7 +1471,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+    <div class="acc-card" data-days="3" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
       <div class="acc-header" style="background:#ffffff">
         <div class="acc-icon blue">📋</div>
         <div class="acc-meta">
@@ -1484,7 +1495,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+    <div class="acc-card" data-days="4" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
       <div class="acc-header" style="background:#ffffff">
         <div class="acc-icon blue">📋</div>
         <div class="acc-meta">
@@ -1508,7 +1519,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-gray" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
+    <div class="acc-card" data-days="6" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d1d5db">
       <div class="acc-header" style="background:#ffffff">
         <div class="acc-icon blue">📋</div>
         <div class="acc-meta">
@@ -1532,7 +1543,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="17" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1556,7 +1567,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="24" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1580,7 +1591,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="25" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1604,7 +1615,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="25" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1628,7 +1639,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="27" data-value="0" data-status="pending" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1652,7 +1663,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="34" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1676,7 +1687,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="39" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1700,7 +1711,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="52" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1724,7 +1735,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="53" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1748,7 +1759,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="53" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1772,7 +1783,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="58" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1796,7 +1807,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="73" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1820,7 +1831,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="74" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1844,7 +1855,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="75" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1868,7 +1879,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="79" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1892,7 +1903,7 @@
         </div>
       </div>
     </div>
-    <div class="acc-card est-yellow" onclick="toggle(this)" style="border-left: 4px solid #d97706">
+    <div class="acc-card" data-days="81" data-value="0" data-status="expired" onclick="toggle(this)" style="border-left: 4px solid #d97706">
       <div class="acc-header" style="background:#fefce8">
         <div class="acc-icon yellow">⏰</div>
         <div class="acc-meta">
@@ -1987,6 +1998,56 @@
 
 <script>
   function toggle(card){ card.classList.toggle('open'); }
+  // ── Drill-down filter ──
+  function filterEstimates(label, testFn) {
+    const cards = document.querySelectorAll('.acc-card[data-days]');
+    let shown = 0;
+    cards.forEach(c => {
+      const days = parseInt(c.dataset.days || 0);
+      const value = parseInt(c.dataset.value || 0);
+      const status = c.dataset.status || '';
+      if (testFn(days, value, status)) { c.classList.remove('hidden'); shown++; }
+      else { c.classList.add('hidden'); }
+    });
+    document.getElementById('filter-label').textContent = `🔍 ${label} — ${shown} estimate${shown !== 1 ? 's' : ''}`;
+    document.getElementById('filter-bar').classList.add('visible');
+    document.getElementById('filter-bar').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  function clearFilter() {
+    document.querySelectorAll('.acc-card[data-days]').forEach(c => c.classList.remove('hidden'));
+    document.getElementById('filter-bar').classList.remove('visible');
+    document.querySelectorAll('.kpi-card.active-filter').forEach(c => c.classList.remove('active-filter'));
+  }
+  function kpiClick(card, label, testFn) {
+    document.querySelectorAll('.kpi-card.active-filter').forEach(c => c.classList.remove('active-filter'));
+    card.classList.add('active-filter');
+    filterEstimates(label, testFn);
+    document.querySelector('.accordion-grid').scrollIntoView({behavior:'smooth'});
+  }
+
+  // Attach drill-down to each KPI card in every panel
+  document.querySelectorAll('.period-panel').forEach(panel => {
+    const cards = panel.querySelectorAll('.kpi-card');
+    cards.forEach(card => {
+      const label = card.querySelector('.kpi-label')?.textContent?.trim() || '';
+      if (label.includes('Unclosed Estimates')) {
+        card.onclick = () => kpiClick(card, 'All Unclosed Estimates', (d,v,s) => true);
+      } else if (label.includes('Expired Estimates')) {
+        card.onclick = () => kpiClick(card, 'Expired Estimates (≥30 days)', (d,v,s) => d >= 30);
+      } else if (label.includes('Pipeline Value')) {
+        card.onclick = () => kpiClick(card, 'All Pipeline Estimates', (d,v,s) => true);
+      } else if (label.includes('Urgent Follow-Up')) {
+        card.onclick = () => kpiClick(card, 'Urgent Follow-Up (30+ days)', (d,v,s) => d >= 30);
+      } else if (label.includes('Needs Follow-Up')) {
+        card.onclick = () => kpiClick(card, 'Needs Follow-Up (14+ days)', (d,v,s) => d >= 14);
+      } else if (label.includes('High Value')) {
+        card.onclick = () => kpiClick(card, 'High Value (≥$1K)', (d,v,s) => v >= 1000);
+      } else if (label.includes('Avg Days Open')) {
+        card.onclick = () => kpiClick(card, 'All Estimates by Age', (d,v,s) => true);
+      }
+    });
+  });
+
   // Team Members toggle
   document.querySelectorAll('[onclick*="tm-open"]').forEach(btn => {
     btn.addEventListener('click', function() {
